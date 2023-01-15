@@ -1,8 +1,32 @@
+const startupDebugger = require('debug')('app:startup');
+const dbDebugger = require('debug')("app:db");
+const config = require("config");
+const morgan = require("morgan");
+const helmet = require("helmet");
 const Joi = require("joi");
 const express = require("express");
+const logger = require("./logger");
+const auth = require("./auth");
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
+app.use(helmet());
+
+console.log(`Application Name: ${config.get("name")}`);
+console.log(`Mail Server: ${config.get("mail.host")}`);
+console.log(`Mail Pass: ${config.get("mail.password")}`);
+
+if (app.get("env") === "development") {
+    app.use(morgan("tiny"));
+    startupDebugger("Morgan enabled...");
+}
+
+// dbDebugger('connected to db...')
+
+app.use(logger);
+app.use(auth);
 
 const port = process.env.PORT || 3000;
 
