@@ -11,6 +11,7 @@ mongoose
     });
 
 const courseSchema = new mongoose.Schema({
+    _id: String,
     tags: [String],
     date: {
         type: Date,
@@ -41,19 +42,50 @@ const displayExc2 = async () => {
 };
 
 const displayExc3 = async () => {
-    const result = await Courses
-        .find({
-            isPublished: true,
-        })
-        .or([
-            {
-                price: {
-                    $gte: 15,
-                },
+    const result = await Courses.find({
+        isPublished: true,
+    }).or([
+        {
+            price: {
+                $gte: 15,
             },
-            { name: /.*by.*/i },
-        ]);
+        },
+        { name: /.*by.*/i },
+    ]);
     console.log(result);
 };
 
-displayExc3();
+// displayExc3();
+
+const update1 = async (id) => {
+    const course = await Courses.findById(id);
+    console.log(course);
+    if (!course) return;
+    course.set({
+        isPublished: true,
+        author: "another author",
+    });
+    // course.isPublished = true;
+    // course.author = "another author";
+    const result = await course.save();
+    console.log(result);
+};
+
+const update2 = async (id) => {
+    const result = await Courses.updateMany({_id:id},{
+        $set: {
+            author: "Mosh",
+            isPublished: false
+        }
+    });
+    console.log(result);
+};
+
+// update2("5a68fde3f09ad7646ddec17e");
+
+const removeCourse = async (id) => {
+    const result = await Courses.deleteOne({_id:id});
+    console.log(result);
+}
+
+removeCourse("5a68fde3f09ad7646ddec17e");
