@@ -2,11 +2,13 @@ const Joi = require("joi");
 const express = require("express");
 const router = express.Router();
 
-const genres = [
-    { id: 1, name: "Horror" },
-    { id: 2, name: "Romance" },
-    { id: 3, name: "Action" },
-];
+const createGenre = require('../db/genresDb');
+
+// const genres = [
+//     { id: 1, name: "Horror" },
+//     { id: 2, name: "Romance" },
+//     { id: 3, name: "Action" },
+// ];
 
 const validateGenre = (genre) => {
     const schema = Joi.object().keys({
@@ -20,15 +22,21 @@ router.get("/", (req, res) => {
     res.send(genres);
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
     const { error } = validateGenre(req.body);
     if (error) return res.status(400).send(error.details[0].message);
     const newGenre = {
-        id: genres.length + 1,
         name: req.body.name,
     };
-    genres.push(newGenre);
-    res.send(newGenre);
+    try {
+        const result = await createGenre(newGenre.name);
+        console.log("result from req", result);
+        res.send(result);
+    } catch (err) {
+        const newErrLog = {log:"Could not create new genre", err}
+        console.log(newErrLog);
+        res.send(newErrLog);
+    }
 });
 
 router.get("/:id", (req, res) => {
