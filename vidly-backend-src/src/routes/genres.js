@@ -2,13 +2,7 @@ const Joi = require("joi");
 const express = require("express");
 const router = express.Router();
 
-const createGenre = require('../db/genresDb');
-
-// const genres = [
-//     { id: 1, name: "Horror" },
-//     { id: 2, name: "Romance" },
-//     { id: 3, name: "Action" },
-// ];
+const {createGenre, findGenre, getGenres, updateGenre, deleteGenre} = require('../db/genresDb');
 
 const validateGenre = (genre) => {
     const schema = Joi.object().keys({
@@ -18,8 +12,16 @@ const validateGenre = (genre) => {
     return schema.validate(genre);
 };
 
-router.get("/", (req, res) => {
-    res.send(genres);
+router.get("/", async (req, res) => {
+    try {
+        const result = await getGenres();
+        console.log("result from req", result);
+        res.send(result);
+    } catch (err) {
+        const newErrLog = {log:"Could not get genres", err:err}
+        console.log(newErrLog);
+        res.send(newErrLog);
+    }
 });
 
 router.post("/", async (req, res) => {
@@ -39,35 +41,46 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.get("/:id", (req, res) => {
-    const genre = genres.find((c) => c.id === parseInt(req.params.id));
-    if (!genre) return res.status(404).send("genre with this id not found");
-    res.send(genre);
+router.get("/:id", async (req, res) => {
+    try {
+        const genre = await findGenre(parseInt(req.params.id));
+        if (!genre) return res.status(404).send("genre with this id not found");
+        res.send(genre);
+    } catch (err) {
+        const newErrLog = {log:"Could not find genre", err}
+        console.log(newErrLog);
+        res.send(newErrLog);
+    }
 });
 
-router.put("/:id", (req, res) => {
-    let genre = genres.find((c) => c.id === parseInt(req.params.id));
-    if (!genre) return res.status(404).send("genre with this id not found");
-    
-    const { error } = validateGenre(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-    
-    genre.name = req.body.name;
-    res.send(genre);
+router.put("/:id", async (req, res) => {
+    try {
+        const { error } = validateGenre(req.body);
+        if (error) return res.status(400).send(error.details[0].message);
+
+        const result = await updateGenre(parseInt(req.params.id), req.body.name);
+        
+        if (!result) return res.status(404).send("genre with this id not found");
+        
+        res.send(result);
+    } catch(err) {
+        const newErrLog = {log:"Could not find genre", err}
+        console.log(newErrLog);
+        res.send(newErrLog);
+    }
 });
 
 
-router.delete("/:id", (req, res) => {
-    const genre = genres.find((c) => c.id === parseInt(req.params.id));
-    if (!genre)
-        return res
-            .status(404)
-            .send("The genre with the given id was not found");
-
-    const index = genres.indexOf(genre);
-    genres.splice(index, 1);
-
-    res.send(genre);
+router.delete("/:id", async (req, res) => {
+    try {
+        const genre = await deleteGenre(parseInt(req.params.id));
+        if (!genre) return res.status(404).send("genre with this id not found");
+        res.send(genre);
+    } catch (err) {
+        const newErrLog = {log:"Could not find genre", err}
+        console.log(newErrLog);
+        res.send(newErrLog);
+    }
 });
 
 
