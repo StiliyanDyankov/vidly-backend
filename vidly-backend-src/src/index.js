@@ -4,11 +4,13 @@ const app = express();
 
 // router
 const routerGenres = require('./routes/genres')
+const routerCustomers = require('./routes/customers')
 
 app.use(express.json());
 
 // api router - middleware
 app.use('/api/genres', routerGenres);
+app.use('/api/customers', routerCustomers);
 
 const port = process.env.PORT || 5000;
 

@@ -11,10 +11,6 @@ mongoose
     });
 
 const genresSchema = new mongoose.Schema({
-    idHandle: {
-        type: Number,
-        min: 1,
-    },
     name: {
         type: String,
         required: true,
@@ -26,24 +22,20 @@ const genresSchema = new mongoose.Schema({
 const Genres = mongoose.model("genres", genresSchema);
 
 const createGenre = async (genreName) => {
-    const newId = await generateNewId();
-    if (typeof newId === "number") {
-        try {
-            const result = await Genres.create({
-                idHandle: newId,
-                name: genreName,
-            });
-            return result;
-        } catch (err) {
-            console.log("Could not create new doc", err.message);
-            return err;
-        }
-    } else return "Could not generate id";
+    try {
+        const result = await Genres.create({
+            name: genreName,
+        });
+        return result;
+    } catch (err) {
+        console.log("Could not create new doc", err.message);
+        return err;
+    }
 };
 
 const findGenre = async (id) => {
     try {
-        const result = await Genres.findOne({ idHandle: id });
+        const result = await Genres.findOne({ _id: id });
         console.log("result from fetch", result);
         return result;
     } catch (err) {
@@ -65,8 +57,8 @@ const getGenres = async () => {
 
 const updateGenre = async (id, newName) => {
     try {
-        await Genres.updateOne({ idHandle: id }, { name: newName });
-        const result = await Genres.findOne({ idHandle: id });
+        await Genres.updateOne({ _id: id }, { name: newName });
+        const result = await Genres.findOne({ _id: id });
         return result;
     } catch (err) {
         console.log("Could not update genre with the given id", err.message);
@@ -76,9 +68,8 @@ const updateGenre = async (id, newName) => {
 
 const deleteGenre = async (id) => {
     try {
-        const genre = await Genres.findOne({ idHandle: id });
-        const result = await Genres.deleteOne({ idHandle: id });
-        if (result) updateDocs(id);
+        const genre = await Genres.findOne({ _id: id });
+        await Genres.deleteOne({ _id: id });
         return genre;
     } catch (err) {
         console.log("Could not delete genre with the given id", err.message);
@@ -94,23 +85,23 @@ module.exports = {
     deleteGenre,
 };
 
-const generateNewId = async () => {
-    try {
-        const newId = (await Genres.find().count()) + 1;
-        console.log(typeof newId);
-        return newId;
-    } catch (err) {
-        console.log("could not generate Id", err.message);
-        return;
-    }
-};
+// const generateNewId = async () => {
+//     try {
+//         const newId = (await Genres.find().count()) + 1;
+//         console.log(typeof newId);
+//         return newId;
+//     } catch (err) {
+//         console.log("could not generate Id", err.message);
+//         return;
+//     }
+// };
 
-async function updateDocs(id) {
-    const rest = await Genres.find({ idHandle: { $gt: id } });
-    rest.forEach(async (genre) => {
-        await Genres.updateOne(
-            { idHandle: genre.idHandle },
-            { idHandle: genre.idHandle - 1 }
-        );
-    });
-}
+// async function updateDocs(id) {
+//     const rest = await Genres.find({ _id: { $gt: id } });
+//     rest.forEach(async (genre) => {
+//         await Genres.updateOne(
+//             { _id: genre._id },
+//             { _id: genre._id - 1 }
+//         );
+//     });
+// }
