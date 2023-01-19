@@ -2,7 +2,7 @@ const Joi = require("joi");
 const express = require("express");
 const router = express.Router();
 
-const {createGenre, findGenre, getGenres, updateGenre, deleteGenre} = require('../db/genresDb');
+const {createGenre, findGenre, getGenres, updateGenre, deleteGenre} = require('../db/genresDb').methods;
 
 const validateGenre = (genre) => {
     const schema = Joi.object().keys({

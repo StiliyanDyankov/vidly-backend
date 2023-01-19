@@ -77,13 +77,14 @@ const deleteGenre = async (id) => {
     }
 };
 
-module.exports = {
+module.exports.methods = {
     createGenre,
     findGenre,
     getGenres,
     updateGenre,
     deleteGenre,
 };
+module.exports.genresSchema = genresSchema;
 
 // const generateNewId = async () => {
 //     try {
