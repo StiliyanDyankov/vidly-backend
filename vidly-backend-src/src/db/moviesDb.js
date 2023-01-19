@@ -119,10 +119,12 @@ const deleteMovie = async (id) => {
     }
 };
 
-module.exports = {
+module.exports.methods = {
     createMovie,
     findMovie,
     getMovies,
     updateMovie,
     deleteMovie,
 };
+
+module.exports.Movies = Movies;

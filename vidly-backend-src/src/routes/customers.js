@@ -8,7 +8,7 @@ const {
     getCustomers,
     updateCustomer,
     deleteCustomer,
-} = require("../db/customersDb");
+} = require("../db/customersDb").methods;
 
 const validateCustomer = (customer) => {
     const schema = Joi.object().keys({

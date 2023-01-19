@@ -6,6 +6,8 @@ const app = express();
 const routerGenres = require('./routes/genres')
 const routerCustomers = require('./routes/customers')
 const routerMovies = require('./routes/movies')
+// const routerRentals = require("./routes/rentals");
+const routerUsers = require("./routes/users");
 
 app.use(express.json());
 
@@ -13,6 +15,8 @@ app.use(express.json());
 app.use('/api/genres', routerGenres);
 app.use('/api/customers', routerCustomers);
 app.use('/api/movies', routerMovies);
+// app.use('/api/rentals', routerRentals);
+app.use('/api/users', routerUsers);
 
 const port = process.env.PORT || 5000;
 

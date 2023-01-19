@@ -104,10 +104,12 @@ const deleteCustomer = async (id) => {
     }
 };
 
-module.exports = {
+module.exports.methods = {
     createCustomer,
     findCustomer,
     getCustomers,
     updateCustomer,
     deleteCustomer,
 };
+
+module.exports.Customers = Customers;

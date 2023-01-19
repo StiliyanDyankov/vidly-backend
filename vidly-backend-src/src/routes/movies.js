@@ -8,7 +8,7 @@ const {
     getMovies,
     updateMovie,
     deleteMovie,
-} = require("../db/moviesDb");
+} = require("../db/moviesDb").methods;
 
 const validateMovie = (movie, strict=false) => {
     const schemaStrict = Joi.object().keys({
