@@ -1,14 +1,15 @@
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
-const genresSchema = require('../db/genresDb').genresSchema;
+const genresSchema = require("../db/genresDb").genresSchema;
+const { findGenre } = require("../db/genresDb").methods;
 
 mongoose
     .connect("mongodb://localhost/vidly-backend")
     .then(() => {
-        console.log("Connected to db...");
+        console.log("Connected to movies db...");
     })
     .catch((err) => {
-        console.log("Couldnt connect to db: ", err.message);
+        console.log("Couldnt connect to movies db: ", err.message);
     });
 
 const movieSchema = new mongoose.Schema({
@@ -18,35 +19,37 @@ const movieSchema = new mongoose.Schema({
         minlength: 3,
         maxlength: 30,
     },
-    genre: {
-        type: mongoose.Types.ObjectId,
-        required: true,
-        ref: 'genres'
-    },
+    genre: genresSchema,
     numberInStock: {
         type: Number,
         min: 0,
         set: (v) => {
             return v || 0;
-        }
+        },
     },
     dailyRentalRate: {
         type: Number,
         min: 0,
         set: (v) => {
             return v || 0;
-        }
+        },
     },
 });
 
 const Movies = mongoose.model("movies", movieSchema);
 
 const createMovie = async (movie) => {
+    // try{
+    // } catch(err) {
+    //     console.log("Could not find genre with given id to embed", err.message);
+    //     return err;
+    // }
     try {
+        const genre = await findGenre(movie.genre);
         console.log("passed to db Movie", movie);
         const result = await Movies.create({
             title: movie.title,
-            genre: movie.genre,
+            genre: genre,
             numberInStock: movie.numberInStock,
             dailyRentalRate: movie.dailyRentalRate,
         });
@@ -79,15 +82,18 @@ const getMovies = async () => {
     }
 };
 
-const updateMovie = async (id, Movie) => {
+const updateMovie = async (id, movie) => {
     try {
         let updatedMovie = {};
-        for (const key in Movie) {
-            updatedMovie[key] = Movie[key];
+        for (const key in movie) {
+            updatedMovie[key] = movie[key];
         }
         console.log("updated Movie", {
-            ...updatedMovie,
+            ...updatedMovie
         });
+        if (updatedMovie.genre) {
+            updatedMovie.genre = await findGenre(movie.genre);
+        }
         await Movies.updateOne(
             { _id: id },
             {

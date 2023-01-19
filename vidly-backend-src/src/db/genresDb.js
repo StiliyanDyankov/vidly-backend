@@ -4,10 +4,10 @@ mongoose.set("strictQuery", false);
 mongoose
     .connect("mongodb://localhost/vidly-backend")
     .then(() => {
-        console.log("Connected to db...");
+        console.log("Connected to genres db...");
     })
     .catch((err) => {
-        console.log("Couldnt connect to db: ", err.message);
+        console.log("Couldnt connect to genres db: ", err.message);
     });
 
 const genresSchema = new mongoose.Schema({
