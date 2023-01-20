@@ -35,8 +35,8 @@ router.post("/", async (req, res) => {
     const { error } = validateUser(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    let user = await Users.findOne({ email: req.body.email });
-    if (user) return res.status(400).send("User already registered");
+    let isRegistered = await Users.findOne({ email: req.body.email });
+    if (isRegistered) return res.status(400).send("User already registered");
 
     console.log("newUsrr", req.body);
     let newUser = new Users(_.pick(req.body, ["name", "password", "email"]));
@@ -44,9 +44,13 @@ router.post("/", async (req, res) => {
     newUser.password = await bcrypt.hash(newUser.password, salt);
 
     try {
-        const result = await createUser(newUser);
-        console.log("result from req", result);
-        res.send(_.pick(newUser, ["_id", "name", "email"]));
+        const user = await createUser(newUser);
+
+        const token = user.generateAuthToken();
+
+        res.header("x-auth-token", token).send(
+            _.pick(newUser, ["_id", "name", "email"])
+        );
     } catch (err) {
         const newErrLog = { log: "Could not create new user", err };
         console.log(newErrLog);
