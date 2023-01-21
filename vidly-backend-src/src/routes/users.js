@@ -20,22 +20,16 @@ const validateUser = (user) => {
     return schema.validate(user);
 };
 
-router.get("/", async (req, res) => {
-    try {
-        const result = await getUsers();
-        console.log("result from req", result);
-        res.send(result);
-    } catch (err) {
-        const newErrLog = { log: "Could not get users", err: err };
-        console.log(newErrLog);
-        res.send(newErrLog);
-    }
-});
 
-router.post("/", auth, async (req, res) => {
+router.get('/me', auth, async (req, res) => {
+    const user = await Users.findById(req.user._id).select("-password");
+    res.send(user); 
+})
+
+router.post("/", async (req, res) => {
     const { error } = validateUser(req.body);
     if (error) return res.status(400).send(error.details[0].message);
-
+    
     let isRegistered = await Users.findOne({ email: req.body.email });
     if (isRegistered) return res.status(400).send("User already registered");
 
@@ -51,13 +45,25 @@ router.post("/", auth, async (req, res) => {
 
         res.header("x-auth-token", token).send(
             _.pick(newUser, ["_id", "name", "email"])
-        );
-    } catch (err) {
+            );
+        } catch (err) {
         const newErrLog = { log: "Could not create new user", err };
         console.log(newErrLog);
         res.send(newErrLog);
     }
 });
+
+// router.get("/", async (req, res) => {
+//     try {
+//         const result = await getUsers();
+//         console.log("result from req", result);
+//         res.send(result);
+//     } catch (err) {
+//         const newErrLog = { log: "Could not get users", err: err };
+//         console.log(newErrLog);
+//         res.send(newErrLog);
+//     }
+// });
 
 router.get("/:id", auth, async (req, res) => {
     try {

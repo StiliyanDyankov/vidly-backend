@@ -1,3 +1,4 @@
+const admin = require('../../middleware/admin');
 const auth = require('../../middleware/auth');
 const Joi = require("joi");
 const express = require("express");
@@ -74,7 +75,7 @@ router.put("/:id", auth, async (req, res) => {
 });
 
 
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
     try {
         const genre = await deleteGenre(req.params.id);
         if (!genre) return res.status(404).send("genre with this id not found");
