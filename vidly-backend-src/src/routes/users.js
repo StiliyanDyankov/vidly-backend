@@ -1,3 +1,4 @@
+const auth = require('../../middleware/auth');
 const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const _ = require("lodash");
@@ -31,7 +32,7 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
     const { error } = validateUser(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
@@ -58,7 +59,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
     try {
         const customer = await findUser(req.params.id);
         if (!customer)
@@ -71,7 +72,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
     try {
         const { error } = validateUser(req.body);
         if (error) return res.status(400).send(error.details[0].message);
@@ -88,7 +89,7 @@ router.put("/:id", async (req, res) => {
     }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
     try {
         const user = await deleteUser(req.params.id);
         if (!user) return res.status(404).send("User with this id not found");
