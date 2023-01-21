@@ -19,7 +19,6 @@ const validateGenre = (genre) => {
 router.get(
     "/",
     asyncMiddleware(async (req, res, next) => {
-        throw new Error('Could not');
         const result = await getGenres();
         console.log("result from req", result);
         res.send(result);
