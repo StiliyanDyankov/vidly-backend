@@ -1,10 +1,12 @@
-const admin = require('../../middleware/admin');
-const auth = require('../../middleware/auth');
+const asyncMiddleware = require("../../middleware/async");
+const admin = require("../../middleware/admin");
+const auth = require("../../middleware/auth");
 const Joi = require("joi");
 const express = require("express");
 const router = express.Router();
 
-const {createGenre, findGenre, getGenres, updateGenre, deleteGenre} = require('../db/genresDb').methods;
+const { createGenre, findGenre, getGenres, updateGenre, deleteGenre } =
+    require("../db/genresDb").methods;
 
 const validateGenre = (genre) => {
     const schema = Joi.object().keys({
@@ -14,78 +16,63 @@ const validateGenre = (genre) => {
     return schema.validate(genre);
 };
 
-router.get("/", async (req, res) => {
-    try {
+router.get(
+    "/",
+    asyncMiddleware(async (req, res, next) => {
         const result = await getGenres();
         console.log("result from req", result);
         res.send(result);
-    } catch (err) {
-        const newErrLog = {log:"Could not get genres", err:err}
-        console.log(newErrLog);
-        res.send(newErrLog);
-    }
-});
+    })
+);
 
-router.post("/", auth, async (req, res) => {
-
-
-    const { error } = validateGenre(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-    const newGenre = {
-        name: req.body.name,
-    };
-    try {
+router.post(
+    "/",
+    auth,
+    asyncMiddleware(async (req, res) => {
+        const { error } = validateGenre(req.body);
+        if (error) return res.status(400).send(error.details[0].message);
+        const newGenre = {
+            name: req.body.name,
+        };
         const result = await createGenre(newGenre.name);
         console.log("result from req", result);
         res.send(result);
-    } catch (err) {
-        const newErrLog = {log:"Could not create new genre", err}
-        console.log(newErrLog);
-        res.send(newErrLog);
-    }
-});
+    })
+);
 
-router.get("/:id", async (req, res) => {
-    try {
+router.get(
+    "/:id",
+    asyncMiddleware(async (req, res) => {
         const genre = await findGenre(req.params.id);
         if (!genre) return res.status(404).send("genre with this id not found");
         res.send(genre);
-    } catch (err) {
-        const newErrLog = {log:"Could not find genre", err}
-        console.log(newErrLog);
-        res.send(newErrLog);
-    }
-});
+    })
+);
 
-router.put("/:id", auth, async (req, res) => {
-    try {
+router.put(
+    "/:id",
+    auth,
+    asyncMiddleware(async (req, res) => {
         const { error } = validateGenre(req.body);
         if (error) return res.status(400).send(error.details[0].message);
 
         const result = await updateGenre(req.params.id, req.body.name);
-        
-        if (!result) return res.status(404).send("genre with this id not found");
-        
+
+        if (!result)
+            return res.status(404).send("genre with this id not found");
+
         res.send(result);
-    } catch(err) {
-        const newErrLog = {log:"Could not find genre", err}
-        console.log(newErrLog);
-        res.send(newErrLog);
-    }
-});
+    })
+);
 
-
-router.delete("/:id", [auth, admin], async (req, res) => {
-    try {
+router.delete(
+    "/:id",
+    [auth, admin],
+    asyncMiddleware(async (req, res) => {
         const genre = await deleteGenre(req.params.id);
         if (!genre) return res.status(404).send("genre with this id not found");
         res.send(genre);
-    } catch (err) {
-        const newErrLog = {log:"Could not find genre", err}
-        console.log(newErrLog);
-        res.send(newErrLog);
-    }
-});
-
+    })
+);
 
 module.exports = router;
