@@ -19,6 +19,7 @@ const validateGenre = (genre) => {
 router.get(
     "/",
     asyncMiddleware(async (req, res, next) => {
+        throw new Error('Could not');
         const result = await getGenres();
         console.log("result from req", result);
         res.send(result);
@@ -69,9 +70,16 @@ router.delete(
     "/:id",
     [auth, admin],
     asyncMiddleware(async (req, res) => {
-        const genre = await deleteGenre(req.params.id);
-        if (!genre) return res.status(404).send("genre with this id not found");
-        res.send(genre);
+        try {
+            const genre = await deleteGenre(req.params.id);
+            if (!genre)
+                return res.status(404).send("genre with this id not found");
+            res.send(genre);
+        } catch (err) {
+            const newErrLog = { log: "Could not find genre", err };
+            console.log(newErrLog);
+            res.send(newErrLog);
+        }
     })
 );
 
