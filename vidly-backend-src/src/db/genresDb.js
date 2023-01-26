@@ -86,6 +86,10 @@ module.exports.methods = {
 };
 module.exports.genresSchema = genresSchema;
 
+module.exports.Genres = Genres;
+
+
+
 // const generateNewId = async () => {
 //     try {
 //         const newId = (await Genres.find().count()) + 1;

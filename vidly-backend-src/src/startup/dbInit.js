@@ -1,13 +1,15 @@
 const { default: mongoose } = require("mongoose");
 const winston = require("winston");
+const config = require('config');
 
 module.exports = function () {
+    const db = config.get('db');
     mongoose
-        .connect("mongodb://localhost/vidly-backend")
+        .connect(db)
         .then(() => {
-            winston.info("Connected to mongodb...");
+            winston.info(`Connected to ${db}...`);
         })
         .catch(() => {
-            winston.info("Couldn't connect to mongodb...");
+            winston.info(`Couldn't connect to ${db}...`);
         });
 };
